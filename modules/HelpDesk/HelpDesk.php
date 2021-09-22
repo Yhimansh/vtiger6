@@ -112,11 +112,17 @@ class HelpDesk extends CRMEntity {
 
 	function save_module($module)
 	{
+
+		//echo '<pre>';print_r($_REQUEST);die();
 		//Inserting into Ticket Comment Table
 		$this->insertIntoTicketCommentTable("vtiger_ticketcomments",$module);
 
 		//Inserting into vtiger_attachments
 		$this->insertIntoAttachment($this->id,$module);
+
+		if($_REQUEST['record']==''){
+			$this->insertItems($this->id,$_REQUEST);
+		}
 
 		//service contract update
 		$return_action = $_REQUEST['return_action'];
@@ -128,6 +134,21 @@ class HelpDesk extends CRMEntity {
 				$on_focus->save_related_module($for_module, $for_crmid, $module, $this->id);
 			}
 		}
+	}
+
+	function insertItems($id,$request)
+	{
+		global $log, $adb;
+
+		$prod_seq=1;
+		$tot_no_prod = 2;
+		for($i=1; $i<=$tot_no_prod; $i++)
+		{
+			$query ="Insert into vtiger_inventoryproductrel(id, productid, sequence_no, quantity, listprice) values(?,?,?,?,?)";
+			$qparams = array($id,$request['item']['product'][$i],$i,$request['item']['qty'][$i],$request['item']['listprice'][$i]);
+			$adb->pquery($query,$qparams);
+		}
+		
 	}
 
 	function save_related_module($module, $crmid, $with_module, $with_crmid) {
