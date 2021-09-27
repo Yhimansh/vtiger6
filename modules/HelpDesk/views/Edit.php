@@ -9,26 +9,46 @@
  * All Rights Reserved.
  * *********************************************************************************** */
 
-class HelpDesk_Detail_View extends Vtiger_Detail_View {
-	
-	function __construct() {
-		parent::__construct();
-		$this->exposeMethod('showRelatedRecords');
-	}
+class HelpDesk_Edit_View extends Vtiger_Edit_View {
 
-	function showModuleDetailView(Vtiger_Request $request) {
-		$products = $this->getProducts($request);
-		echo parent::showModuleDetailView($request);
-		//$viewer = $this->getViewer($request);
-		//$viewer->assign('PRODUCTS', $products);
-		
-	}
+	public function process(Vtiger_Request $request) {
+        global $log, $adb;
 
-	function getProducts(Vtiger_Request $request) {
-		$record = $request->get('record');
 		$moduleName = $request->getModule();
+        $viewer = $this->getViewer($request);
+		$recordId = $request->get('record');
+        $recordModel = $this->record;
+        if(!$recordModel){
+           if (!empty($recordId)) {
+               $recordModel = Vtiger_Record_Model::getInstanceById($recordId, $moduleName);
+               // $relatedProducts = getAssociatedProducts($moduleName, $recordId);
 
-		global $log, $adb;
+               $relatedProducts = $this->getProducts($moduleName, $recordId);
+
+               //echo '<pre>'; print_r($relatedProducts);die;
+
+                $viewer->assign('PRODUCTS', $relatedProducts);
+                $viewer->assign('RECORD_ID', $record);
+                $viewer->assign('MODE', 'edit');
+           } else {
+               $recordModel = Vtiger_Record_Model::getCleanInstance($moduleName);
+               $viewer->assign('MODE', '');
+           }
+            $this->record = $recordModel;
+        }
+
+		
+
+		// if(!$this->record){
+  //           $this->record = $recordModel;
+  //       }
+
+		parent::process($request);
+	}
+
+
+    function getProducts($moduleName, $recordId) {
+        global $log, $adb;
         $query="SELECT
             case when vtiger_products.productid != '' then vtiger_products.productname else vtiger_service.servicename end as productname,
             case when vtiger_products.productid != '' then vtiger_products.product_no else vtiger_service.service_no end as productcode,
@@ -46,7 +66,7 @@ class HelpDesk_Detail_View extends Vtiger_Detail_View {
                                 ON vtiger_service.serviceid=vtiger_inventoryproductrel.productid
                         WHERE id=?
                         ORDER BY sequence_no";
-        $params = array($record);
+        $params = array($recordId);
 
         $result = $adb->pquery($query, $params);
         $num_rows=$adb->num_rows($result);
@@ -80,49 +100,7 @@ class HelpDesk_Detail_View extends Vtiger_Detail_View {
             $product_Detail[$i]['productName']= from_html($productname);
         }
         //echo '<pre>'; print_r($product_Detail);die;
-        $viewer = $this->getViewer($request);
-		$viewer->assign('PRODUCTS', $product_Detail);
-        return true;
-	}
+        return $product_Detail;
+    }
 
-	/**
-	 * Function to get activities
-	 * @param Vtiger_Request $request
-	 * @return <List of activity models>
-	 */
-	public function getActivities(Vtiger_Request $request) {
-		$moduleName = 'Calendar';
-		$moduleModel = Vtiger_Module_Model::getInstance($moduleName);
-
-		$currentUserPriviligesModel = Users_Privileges_Model::getCurrentUserPrivilegesModel();
-		if($currentUserPriviligesModel->hasModulePermission($moduleModel->getId())) {
-			$moduleName = $request->getModule();
-			$recordId = $request->get('record');
-
-			$pageNumber = $request->get('page');
-			if(empty ($pageNumber)) {
-				$pageNumber = 1;
-			}
-			$pagingModel = new Vtiger_Paging_Model();
-			$pagingModel->set('page', $pageNumber);
-			$pagingModel->set('limit', 10);
-
-			if(!$this->record) {
-				$this->record = Vtiger_DetailView_Model::getInstance($moduleName, $recordId);
-			}
-			$recordModel = $this->record->getRecord();
-			$moduleModel = $recordModel->getModule();
-
-			$relatedActivities = $moduleModel->getCalendarActivities('', $pagingModel, 'all', $recordId);
-
-			$viewer = $this->getViewer($request);
-			$viewer->assign('RECORD', $recordModel);
-			$viewer->assign('MODULE_NAME', $moduleName);
-			$viewer->assign('PAGING_MODEL', $pagingModel);
-			$viewer->assign('PAGE_NUMBER', $pageNumber);
-			$viewer->assign('ACTIVITIES', $relatedActivities);
-
-			return $viewer->view('RelatedActivities.tpl', $moduleName, true);
-		}
-	}
 }

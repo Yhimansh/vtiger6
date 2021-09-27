@@ -122,6 +122,8 @@ class HelpDesk extends CRMEntity {
 
 		if($_REQUEST['record']==''){
 			$this->insertItems($this->id,$_REQUEST);
+		} else {
+			$this->updateItems($this->id,$_REQUEST);
 		}
 
 		//service contract update
@@ -136,18 +138,51 @@ class HelpDesk extends CRMEntity {
 		}
 	}
 
+	function updateItems($id,$request){
+		global $log, $adb;
+		//print_r($id);die;
+		$ac_product = array_filter($request['item']['qty'], function ($val) {if ($val >= 0) {return true;} else {return false;}});
+		$tot_no_prod = count($ac_product);
+		$i=1;
+		foreach ($ac_product as $key => $value) {
+			$productId = $request['item']['product'][$key];
+
+			$query ="UPDATE vtiger_inventoryproductrel SET quantity=? WHERE id=? AND productid=?";
+			$qparams = array($request['item']['qty'][$key],$id,$productId);
+			$adb->pquery($query,array($qparams));
+
+			$remaing_qty = intval($request['item']['qtystck'][$key]) - intval($request['item']['qty'][$key]);
+
+			$adb->pquery('UPDATE vtiger_products SET qtyinstock=? WHERE productid=?', array($remaing_qty,$productId));
+			$i++;
+		}
+	}
+
 	function insertItems($id,$request)
 	{
 		global $log, $adb;
-
+		$ac_product = array_filter($request['item']['qty'], function ($val) {if ($val >= 0) {return true;} else {return false;}});
 		$prod_seq=1;
-		$tot_no_prod = 2;
-		for($i=1; $i<=$tot_no_prod; $i++)
-		{
+		$tot_no_prod = count($ac_product);
+		$i=1;
+		foreach ($ac_product as $key => $value) {
+			$productId = $request['item']['product'][$key];
+
 			$query ="Insert into vtiger_inventoryproductrel(id, productid, sequence_no, quantity, listprice) values(?,?,?,?,?)";
-			$qparams = array($id,$request['item']['product'][$i],$i,$request['item']['qty'][$i],$request['item']['listprice'][$i]);
+			$qparams = array($id,$productId,$i,$request['item']['qty'][$key],$request['item']['listprice'][$key]);
 			$adb->pquery($query,$qparams);
+
+			$remaing_qty = intval($request['item']['qtystck'][$key]) - intval($request['item']['qty'][$key]);
+
+			$adb->pquery('UPDATE vtiger_products SET qtyinstock=? WHERE productid=?', array($remaing_qty,$productId));
+			$i++;
 		}
+		// for($i=1; $i<=$tot_no_prod; $i++)
+		// {
+		// 	$query ="Insert into vtiger_inventoryproductrel(id, productid, sequence_no, quantity, listprice) values(?,?,?,?,?)";
+		// 	$qparams = array($id,$request['item']['product'][$i],$i,$request['item']['qty'][$i],$request['item']['listprice'][$i]);
+		// 	$adb->pquery($query,$qparams);
+		// }
 		
 	}
 

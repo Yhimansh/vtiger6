@@ -19,6 +19,7 @@
                 </th>
                 <th colspan="2" class="chznDropDown">
                     <div class="row-fluid">
+                        {if ($PRODUCTS|@count) == 0}
                         <select class="chzn-select" data-validation-engine="validate[required,funcCall[Vtiger_Base_Validator_Js.invokeValidation]]"  name="productcategory" id="productcategory">
                             <optgroup>
                                 <option value="">Select an Option</option>
@@ -28,6 +29,7 @@
                                 {/foreach}
                             </optgroup>
                         </select>
+                        {/if}
                     </div>
                 </th>
                 <th colspan="2" class="chznDropDown">
@@ -41,6 +43,15 @@
             </tr>
         </thead>
         <tbody class="pro_div">
+            {foreach from=$PRODUCTS item=PRODUCT_VALUE key=KEY}
+            <tr>
+                <td colspan="2">
+                <input type="hidden" name="item[product][]" id="" value="{$PRODUCT_VALUE.hdnProductId}" >
+                {$PRODUCT_VALUE.productName}  (Qty In stock : <b>{$PRODUCT_VALUE.qtyInStock} </b>)</td>
+                <td colspan="2"><input type="hidden" name="item[qtystck][]"  class="qtystock" value="{(int)$PRODUCT_VALUE['qtyInStock']}" ><input type="number" data-validation-engine="validate[required,funcCall[Vtiger_Base_Validator_Js.invokeValidation]]" name="item[qty][]" min="0" class="qty" value="{(int)$PRODUCT_VALUE['qty']}" required></td>
+                <td colspan="2"><input type="hidden" name="item[listprice][]" id="listprice1" value="{(int)$PRODUCT_VALUE['listPrice']}" ></td>
+            </tr>
+            {/foreach}
             <!-- <tr>
                 <td colspan="2"><input type="text" name="item[product][1]" id="item1" value="205" ></td>
                 <td colspan="2"><input type="text" name="item[qty][1]" id="qty1" value="1" ></td>

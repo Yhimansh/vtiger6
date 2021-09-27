@@ -100,7 +100,7 @@ function getAssociatedProducts($module,$focus,$seid='')
 	// DG 15 Aug 2006
 	// Add "ORDER BY sequence_no" to retain add order on all inventoryproductrel items
 
-	if($module == 'Quotes' || $module == 'PurchaseOrder' || $module == 'SalesOrder' || $module == 'Invoice')
+	if($module == 'Quotes' || $module == 'PurchaseOrder' || $module == 'SalesOrder' || $module == 'Invoice' || $module == 'HelpDesk')
 	{
 		$query="SELECT
 					case when vtiger_products.productid != '' then vtiger_products.productname else vtiger_service.servicename end as productname,
