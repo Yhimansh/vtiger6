@@ -162,6 +162,7 @@ class HelpDesk extends CRMEntity {
 	{
 		global $log, $adb;
 		$ac_product = array_filter($request['item']['qty'], function ($val) {if ($val > 0) {return true;} else {return false;}});
+		//print_r("SDfsdf");
 		$prod_seq=1;
 		$tot_no_prod = count($ac_product);
 		$i=1;
