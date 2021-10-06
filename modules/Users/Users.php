@@ -380,6 +380,7 @@ class Users extends CRMEntity {
                 $crypt_type = $this->db->query_result($result, 0, 'crypt_type');
 				$this->column_fields["user_name"] = $this->db->query_result($result, 0, 'user_name');
                 $encrypted_password = $this->encrypt_password($user_password, $crypt_type);
+                //return $encrypted_password;
                 $query = "SELECT 1 from $this->table_name where user_name=? AND user_password=? AND status = ?";
                 $result = $this->db->requirePsSingleResult($query, array($usr_name, $encrypted_password, 'Active'), false);
                 if (empty($result)) {

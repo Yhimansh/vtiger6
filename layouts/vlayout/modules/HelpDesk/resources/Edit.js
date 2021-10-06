@@ -80,9 +80,39 @@ Vtiger_Edit_Js("HelpDesk_Edit_Js",{},{
 		})
 	},
 
+	registerAddingNewProductsAndServices: function(){
+		var thisInstance = this;
+		//var lineItemTable = this.getLineItemContentsContainer();
+		jQuery('#addProduct').on('click',function(){
+			//alert("Fasdf");
+
+				var row_sequence = $('#row_count').val();
+				
+var html = '<tr id="add_new_row'+row_sequence+'">'+
+				'<td colspan="2">'+
+					' <input type="text" name="item[product][]" id="" value="" >'+
+				' <td colspan="2">'+
+					'<input type="number">'+
+						'</td>'+
+				'</tr>';
+$('#appendtable tbody').append(html);		
+row_sequence = parseInt(row_sequence) + 1;  	
+	
+			// var newRow = thisInstance.getBasicRow().addClass(thisInstance.rowClass);
+			// jQuery('.lineItemPopup[data-module-name="Services"]',newRow).remove();
+			// var sequenceNumber = thisInstance.getNextLineItemRowNumber();
+			// newRow = newRow.appendTo(lineItemTable);
+			// thisInstance.checkLineItemRow();
+			// newRow.find('input.rowNumber').val(sequenceNumber);
+			// thisInstance.updateLineItemsElementWithSequenceNumber(newRow,sequenceNumber);
+			// newRow.find('input.productName').addClass('autoComplete');
+			// thisInstance.registerLineItemAutoComplete(newRow);
+		});
+    },
 	registerBasicEvents : function(container){
 		this._super(container);
 		this.fetchItems(container);
 		this.stockValidate();
+		this.registerAddingNewProductsAndServices();
 	}
 })

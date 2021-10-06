@@ -25,7 +25,7 @@ class Users_Login_Action extends Vtiger_Action_Controller {
 
 		$user = CRMEntity::getInstance('Users');
 		$user->column_fields['user_name'] = $username;
-
+		
 		if ($user->doLogin($password)) {
 			session_regenerate_id(true); // to overcome session id reuse.
 

@@ -51,7 +51,7 @@ $dbconfig['db_server'] = 'localhost';
 $dbconfig['db_port'] = ':3306';
 $dbconfig['db_username'] = 'root';
 $dbconfig['db_password'] = '';
-$dbconfig['db_name'] = 'vtiger6';
+$dbconfig['db_name'] = 'crm1';
 $dbconfig['db_type'] = 'mysqli';
 $dbconfig['db_status'] = 'true';
 
@@ -82,12 +82,12 @@ $dbconfigoption['ssl'] = false;
 
 $host_name = $dbconfig['db_hostname'];
 
-$site_URL = 'http://localhost/vtigerr6/';
+$site_URL = 'http://localhost/vtiger6/';
 
 // url for customer portal (Example: http://vtiger.com/portal)
 $PORTAL_URL = $site_URL.'/customerportal';
 // root directory path
-$root_directory = 'C:\xampp\htdocs\vtigerr6/';
+$root_directory = 'C:\xampp\htdocs\vtiger6/';
 
 // cache direcory path
 $cache_dir = 'cache/';
